@@ -1,4 +1,4 @@
-// Mue Alin
+// Futu-ti curul ma-tii, Bogdane, curva satului
 #include <iterator>
 #include <string>
 #include <vector>
