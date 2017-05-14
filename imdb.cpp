@@ -1,4 +1,3 @@
-// Mue Alin
 #include <iterator>
 #include <string>
 #include <vector>

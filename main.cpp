@@ -113,7 +113,7 @@ std::string IMDb::read_input_line(const std::string& line) {
     } else if (operation_type == GET_TOP_K_PARTNERS_FOR_ACTOR) {
 
         int k = std::stoi(elems[1]);
-        std::string actor_id = elems[1];
+        std::string actor_id = elems[2];
         result = get_top_k_partners_for_actor(k, actor_id);
 
     } else if (operation_type == GET_TOP_K_MOST_POPULAR_MOVIES) {
