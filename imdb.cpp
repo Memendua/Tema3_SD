@@ -1,6 +1,7 @@
 #include <iterator>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include "imdb.h"
 

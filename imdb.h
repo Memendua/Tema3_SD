@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #define NONE                            "none"
 
@@ -59,6 +60,10 @@ public:
 
 private:
     // add any variables you need here.
+    std::unordered_map<std::string, std::string> actors;
+    std::unordered_map<std::string, std::string> users;
+    std::unordered_map<std::string, movie> movies;
+    
 };
 
 #endif
