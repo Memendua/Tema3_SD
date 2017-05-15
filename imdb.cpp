@@ -18,9 +18,21 @@ void IMDb::add_movie(std::string movie_name,
                      std::vector<std::string> categories,
                      std::string director_name,
                      std::vector<std::string> actor_ids) {
+
     movie m(movie_name, movie_id, timestamp, categories, director_name, actor_ids);
     std::pair<std::string, movie> elem(movie_id, m);
     movies.insert(elem);
+
+    for (i = 0; i < actor_ids.size(); ++i) {
+        if (actors[i].debut_year > timestamp) {
+            actors[i].debut_year = timestamp;
+        }
+        if (actors[i].last_year < timestamp) {
+            actors[i].last_year = timestamp;
+        }
+        actors[i].years = actors[i].last_year - 
+                          actors[i].debut_year;
+    }
 }
 
 void IMDb::add_user(std::string user_id, std::string name) {
@@ -35,19 +47,39 @@ void IMDb::add_actor(std::string actor_id, std::string name) {
 }
 
 void IMDb::add_rating(std::string user_id, std::string movie_id, int rating) {
-    movies[movie_id].add_rating(user_id, rating);
+    if (movies.find(movie_id) != std::unordered_map::end) {
+        movies[movie_id].add_rating(user_id, rating);
+    }
 }
 
 void IMDb::update_rating(std::string user_id, std::string movie_id, int rating) {
-    movies[movie_id].update_rating(user_id, rating);
+    if (movies.find(movie_id) != std::unordered_map::end) {
+        movies[movie_id].update_rating(user_id, rating);
+    }
 }
 
 void IMDb::remove_rating(std::string user_id, std::string movie_id) {
-    movies[movie_id].remove_rating(user_id, rating);
+    if (movies.find(movie_id) != std::unordered_map::end) {
+        movies[movie_id].remove_rating(user_id, rating);
+    }
 }
 
 std::string IMDb::get_rating(std::string movie_id) {
-    return "";
+    if (movies.find(movie_id) != std::unordered_map::end) {
+        double rating;
+        std::string final_rating;
+        int temp_rating = (int)(movies[movie_id].get_rating() * 1000);
+        if (temp_rating % 10 >= 5) {
+            temp_rating += 10;
+            temp_rating /= 10;
+            rating = (double)temp_rating / 100.0;
+            final_rating = to_string(rating);
+            return final_rating;
+        }
+    }
+    if (movies[movie_id].no_rating()) {
+        return "none";
+    }
 }
 
 std::string IMDb::get_longest_career_actor() {

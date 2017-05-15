@@ -23,10 +23,10 @@ movie::~movie() {};
 void movie::add_rating(std::string user_id, int rating) {
 	if (ratings.find(user_id) == std::unordered_map::end) {
 		ratings[user_id] = rating;
-		this->rating *= this->nr_ratings;
+		this->rating *= (double)this->nr_ratings;
 		++this->nr_ratings;
-		this->rating += rating;
-		this->rating /= this->nr_ratings;
+		this->rating += (double)rating;
+		this->rating /= (double)this->nr_ratings;
 	}
 }
 
@@ -51,10 +51,27 @@ void movie::remove_rating(std::string user_id) {
 	}
 }
 
+double movie::get_rating() {
+	return this->rating;
+}
+
+bool movie::no_ratings() {
+	return nr_ratings ? false : true;
+}
+
+std::vector<std::string> get_actors() {
+	return actor_ids;
+}
+
 actor::actor(std::string actor_id, std::string name) {
 	this->actor_name = name;
 	this->actor_id = actor_id;
 	this->debut_year = INT_MAX;
 	this->last_year = INT_MIN;
+	this->years = 0;
 }
+
+actor::~actor() {};
+
+
 

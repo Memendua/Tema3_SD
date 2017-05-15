@@ -8,7 +8,7 @@
 class movie {
 private:
 	int timestamp;
-	int rating;
+	double rating;
 	int nr_ratings;
 	std::string movie_name;
 	std::string movie_id;
@@ -26,27 +26,35 @@ public:
 	void add_rating(std::string user_id, int rating);
     void update_rating(std::string user_id, int rating);
     void remove_rating(std::string user_id);
+
+    double get_rating();
+    bool no_ratings();
+
+    std::vector<std::string> get_actors();
 };
 
-class actor {
-private:
+struct actor {
+
 	int debut_year;
 	int last_year;
+	int years;
 	std::string actor_name;
 	std::string actor_id;
 
-public:
+
 	actor(std::string actor_id, std::string name);
 	~actor();
+
+	bool sort_by_years()
 }
 
-class director {
-private:
+struct director {
+
 	int nr_actors;
 	std::string director_name;
 	std::unordered_map<std::string, std::string> collaborations;
 
-public:
+
 	director(std::string name);
 	~director();
 
