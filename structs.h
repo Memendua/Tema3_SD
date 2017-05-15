@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
 
 class movie {
@@ -30,36 +31,44 @@ public:
     double get_rating();
     bool no_ratings();
 
-    std::vector<std::string> get_actors();
 };
 
-struct actor {
-
+class actor {
+private:
 	int debut_year;
 	int last_year;
 	int years;
 	std::string actor_name;
 	std::string actor_id;
 
-
+public:
 	actor(std::string actor_id, std::string name);
+	actor(const actor &actor2);
 	~actor();
 
-	bool sort_by_years()
+	int& get_debut_year();
+	int& get_last_year();
+	int& get_years();
+
+	bool operator<(const actor &actor2);
+	actor& operator=(const actor &actor2);
 }
 
 struct director {
 
 	int nr_actors;
 	std::string director_name;
-	std::unordered_map<std::string, std::string> collaborations;
+	std::unordered_set<std::string> collaborations;  // L-am facut set
 
 
 	director(std::string name);
+	director(const director &director2);
 	~director();
 
-	void check_collaboration(std::string actor_id);
+	bool check_collaboration(std::string actor_id);
 	void add_collaboration(std::string actor_id);
 
+	bool operator<(const director &director2);
+	director& operator=(const director &director);
 }
 #endif

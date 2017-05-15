@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <set>
 
 #define NONE                            "none"
 
@@ -63,7 +64,8 @@ private:
     std::unordered_map<std::string, actor> actors;
     std::unordered_map<std::string, std::string> users;
     std::unordered_map<std::string, movie> movies;
-    
+    std::set<actor> actors_career;
+    std::multimap<std::string, director> directors_influence;
 };
 
 #endif
