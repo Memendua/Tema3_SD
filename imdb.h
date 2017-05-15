@@ -60,7 +60,7 @@ public:
 
 private:
     // add any variables you need here.
-    std::unordered_map<std::string, std::string> actors;
+    std::unordered_map<std::string, actor> actors;
     std::unordered_map<std::string, std::string> users;
     std::unordered_map<std::string, movie> movies;
     
