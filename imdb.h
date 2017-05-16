@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include <set>
 
+#include "structs.h"
+
 #define NONE                            "none"
 
 #define ADD_MOVIE                       "add_movie"
@@ -64,8 +66,10 @@ private:
     std::unordered_map<std::string, actor> actors;
     std::unordered_map<std::string, std::string> users;
     std::unordered_map<std::string, movie> movies;
-    std::set<actor> actors_career;
-    std::multimap<std::string, director> directors_influence;
+    std::set<movie> top_movies;  // Filme sortate dupa an;
+    std::set<actor> actors_career;  // Actori sortati dupa anii de cariera;
+    std::unordered_map<std::string, director> directors;
+    std::set<director> directors_influence;
 };
 
 #endif

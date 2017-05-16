@@ -29,8 +29,11 @@ public:
     void remove_rating(std::string user_id);
 
     double get_rating();
+    std::string get_movie_id() const;
+
     bool no_ratings();
 
+    bool operator<(movie &movie1);
 };
 
 class actor {
@@ -49,10 +52,11 @@ public:
 	int& get_debut_year();
 	int& get_last_year();
 	int& get_years();
+	std::string get_id();
 
 	bool operator<(const actor &actor2);
 	actor& operator=(const actor &actor2);
-}
+};
 
 struct director {
 
@@ -70,5 +74,5 @@ struct director {
 
 	bool operator<(const director &director2);
 	director& operator=(const director &director);
-}
+};
 #endif

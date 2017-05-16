@@ -51,8 +51,19 @@ void movie::remove_rating(std::string user_id) {
 	}
 }
 
+bool movie::operator<(movie &movie2) {
+	if (movie2.timestamp == this->timestamp) {
+		return this->movie_name > movie2.movie_name;
+	}
+	return this->timestamp < movie2.timestamp;
+}
+
 double movie::get_rating() {
 	return this->rating;
+}
+
+std::string movie::get_movie_id() const {
+	return movie_id;
 }
 
 bool movie::no_ratings() {
@@ -89,12 +100,16 @@ int& actor::get_years() {
     return years;
 }
 
+std::string actor::get_id() {
+	return actor_id;
+}
+
 bool actor::operator<(const actor &actor2) {
     if (this->years == actor2.years) {
         // Sortez descrescator dupa id
         // Astfel cel mai mare element din set va avea
         // cei mai multi ani, si "cel mai mic" nume
-        return this->actor_id > actor2.actor_name;
+        return this->actor_id > actor2.actor_id;
     }
     return this->years < actor2.years;
 }
