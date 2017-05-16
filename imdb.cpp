@@ -20,12 +20,15 @@ void IMDb::add_movie(std::string movie_name,
                      std::string director_name,
                      std::vector<std::string> actor_ids) {
 
+    // Adaugare film in baza de date;
     movie m(movie_name, movie_id, timestamp, categories, director_name,
             actor_ids);
     std::pair<std::string, movie> elem(movie_id, m);
     movies.insert(elem);
     top_movies.insert(m);
 
+
+    // Caut directorul in baza de date
     auto found_director = directors.find(director_name);
     auto found_influence = directors_influence.find(found_director->second);
 
@@ -38,9 +41,8 @@ void IMDb::add_movie(std::string movie_name,
         found_director = directors.insert(elem).first;
     }
 
-    for (int i = 0; i < actor_ids.size(); ++i) {
-        // Trebuia actors[actor_ids[i]]
-        // Am refacut structura la clasa si am facut getters
+    for (unsigned int i = 0; i < actor_ids.size(); ++i) {
+        // Se adauga sau se actualizeaza datele despre un actor;
         actor &current_actor = actors[actor_ids[i]];
         int &debut_year = current_actor.get_debut_year();
         int &last_year = current_actor.get_last_year();
@@ -82,7 +84,7 @@ void IMDb::add_user(std::string user_id, std::string name) {
 
 void IMDb::add_actor(std::string actor_id, std::string name) {
     // Idem add_user
-    actor new_actor(actor_id, name);
+    actor new_actor(actor_id);
     std::pair<std::string, actor> elem(actor_id, new_actor);
     actors.insert(elem);
 }
@@ -131,7 +133,7 @@ std::string IMDb::get_rating(std::string movie_id) {
 
 std::string IMDb::get_longest_career_actor() {
     if (!actors_career.empty()) {
-        auto iter = actors_career.rbegin();
+        auto iter = actors_career.begin();
         actor current_actor = *iter;
 
         return current_actor.get_id();
@@ -141,10 +143,9 @@ std::string IMDb::get_longest_career_actor() {
 
 std::string IMDb::get_most_influential_director() {
     if (!directors_influence.empty()) {
-        auto iter = directors_influence.rbegin();
-        std::string name = iter->director_name;
-
-        return name;
+        auto iter = directors_influence.begin();
+        
+        return iter->director_name;
     }
     return NONE;
 }
@@ -159,10 +160,11 @@ std::string IMDb::get_2nd_degree_colleagues(std::string actor_id) {
 
 std::string IMDb::get_top_k_most_recent_movies(int k) {
     if (!top_movies.empty()) {
-        std::set<movie>::reverse_iterator it = top_movies.rbegin();
+        int i = 0;
+        std::set<movie>::iterator it = top_movies.begin();
         std::string result = it->get_movie_id();
-        for (it = top_movies.rbegin() + 1; it != top_movies.rbegin() + k
-                                        && it != top_movies.rend(); ++it) {
+        for (it = top_movies.begin(); i < k && 
+                                      it != top_movies.end(); ++it, ++i) {
 
             result += " " + it->get_movie_id();
         }

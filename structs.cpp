@@ -1,11 +1,16 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
-#include <limits>
+#include <limits.h>
 
 #include "structs.h"
 
-movie::movie(std::string movie_name, std::string movie_id, int &timestamp,
+movie::movie() {
+	this->rating = 0;
+	this->nr_ratings = 0;
+}
+
+movie::movie(std::string movie_name, std::string movie_id, int timestamp,
 		  	 std::vector<std::string> categories, std::string director_name,
           	 std::vector<std::string> actor_ids) {
 	this->movie_name = movie_name;
@@ -21,7 +26,7 @@ movie::movie(std::string movie_name, std::string movie_id, int &timestamp,
 movie::~movie() {};
 
 void movie::add_rating(std::string user_id, int rating) {
-	if (ratings.find(user_id) == std::unordered_map::end) {
+	if (ratings.find(user_id) == ratings.end()) {
 		ratings[user_id] = rating;
 		this->rating *= this->nr_ratings;
 		++this->nr_ratings;
@@ -51,11 +56,12 @@ void movie::remove_rating(std::string user_id) {
 	}
 }
 
-bool movie::operator<(movie &movie2) {
-	if (movie2.timestamp == this->timestamp) {
-		return this->movie_name > movie2.movie_name;
+bool movie::operator<(const movie &movie2) const {
+	if (this->timestamp > movie2.timestamp) {
+		return true;
 	}
-	return this->timestamp < movie2.timestamp;
+
+	return false;
 }
 
 double movie::get_rating() {
@@ -70,8 +76,13 @@ bool movie::no_ratings() {
 	return nr_ratings ? false : true;
 }
 
-actor::actor(std::string actor_id, std::string name) {
-	this->actor_name = name;
+actor::actor() {
+	this->debut_year = INT_MAX;
+	this->last_year = INT_MIN;
+	this->years = 0;
+}
+
+actor::actor(std::string actor_id) {
 	this->actor_id = actor_id;
 	this->debut_year = INT_MAX;
 	this->last_year = INT_MIN;
@@ -104,14 +115,16 @@ std::string actor::get_id() {
 	return actor_id;
 }
 
-bool actor::operator<(const actor &actor2) {
-    if (this->years == actor2.years) {
-        // Sortez descrescator dupa id
-        // Astfel cel mai mare element din set va avea
-        // cei mai multi ani, si "cel mai mic" nume
-        return this->actor_id > actor2.actor_id;
+bool actor::operator<(const actor &actor2) const {
+    if (this->years > actor2.years) {
+    	return true;
+    } else if (this->years == actor2.years) {
+    	if (this->actor_id < actor2.actor_id) {
+    		return true;
+    	}
     }
-    return this->years < actor2.years;
+
+    return false;
 }
 
 actor& actor::operator=(const actor &actor2) {
@@ -121,6 +134,10 @@ actor& actor::operator=(const actor &actor2) {
     this->actor_name = actor2.actor_name;
     this->actor_id = actor2.actor_id;
     return *this;
+}
+
+director::director() {
+	nr_actors = 0;
 }
 
 director::director(std::string name) {
@@ -134,14 +151,17 @@ director::director(const director &director2) {
     this->collaborations = director2.collaborations;
 }
 
+director::~director() {};
+
 director& director::operator=(const director &director2) {
     this->director_name = director2.director_name;
     this->nr_actors = director2.nr_actors;
     this->collaborations = director2.collaborations;
+    return *this;
 }
 
 bool director::check_collaboration(std::string actor_id) {
-    if (collaborations.find(actor_id) != unordered_set::end) {
+    if (collaborations.find(actor_id) != collaborations.end()) {
         return true;
     }
     return false;
@@ -152,10 +172,14 @@ void director::add_collaboration(std::string actor_id) {
     ++nr_actors;
 }
 
-bool director::operator<(const director &director2) {
-    if (this->nr_actors == director2.nr_actors) {
-        // La fel ca la actori
-        return this->director_name > director2.director_name;
+bool director::operator<(const director &director2) const {
+    if (this->nr_actors > director2.nr_actors) {
+    	return true;
+    } else if (this->nr_actors == director2.nr_actors) {
+    	if (this->director_name < director2.director_name) {
+    		return true;
+    	}
     }
-    return this->nr_actors < director2.nr_actors;
+
+    return false;
 }

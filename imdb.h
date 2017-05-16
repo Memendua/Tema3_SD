@@ -62,14 +62,20 @@ public:
     std::string read_input_line(const std::string& line);
 
 private:
-    // add any variables you need here.
-    std::unordered_map<std::string, actor> actors;
-    std::unordered_map<std::string, std::string> users;
+    // Cheie: movie_id; Valoare: variabila de tip movie;
     std::unordered_map<std::string, movie> movies;
-    std::set<movie> top_movies;  // Filme sortate dupa an;
-    std::set<actor> actors_career;  // Actori sortati dupa anii de cariera;
+    // Filme sortate dupa an;
+    std::set<movie> top_movies;
+    // Cheie: actor_id; Valoare: variabila de tip actor;
+    std::unordered_map<std::string, actor> actors;
+    // Actori sortati dupa anii de cariera;
+    std::set<actor> actors_career;
+    // Cheie: nume director; Valoare: variabila de tip director;
     std::unordered_map<std::string, director> directors;
+    // Directori sortati dupa numarul de colaborari;
     std::set<director> directors_influence;
+    // Cheie: user_id; Valoare: user_name;
+    std::unordered_map<std::string, std::string> users;
 };
 
 #endif

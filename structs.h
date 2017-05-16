@@ -19,6 +19,7 @@ private:
 	std::unordered_map<std::string, int> ratings;
 
 public:
+	movie();
 	movie(std::string movie_name, std::string movie_id, int timestamp,
 		  std::vector<std::string> categories, std::string director_name,
           std::vector<std::string> actor_ids);
@@ -33,7 +34,7 @@ public:
 
     bool no_ratings();
 
-    bool operator<(movie &movie1);
+    bool operator<(const movie &movie1) const;
 };
 
 class actor {
@@ -45,7 +46,8 @@ private:
 	std::string actor_id;
 
 public:
-	actor(std::string actor_id, std::string name);
+	actor();
+	actor(std::string actor_id);
 	actor(const actor &actor2);
 	~actor();
 
@@ -54,7 +56,7 @@ public:
 	int& get_years();
 	std::string get_id();
 
-	bool operator<(const actor &actor2);
+	bool operator<(const actor &actor2) const;
 	actor& operator=(const actor &actor2);
 };
 
@@ -64,7 +66,7 @@ struct director {
 	std::string director_name;
 	std::unordered_set<std::string> collaborations;  // L-am facut set
 
-
+	director();
 	director(std::string name);
 	director(const director &director2);
 	~director();
@@ -72,7 +74,7 @@ struct director {
 	bool check_collaboration(std::string actor_id);
 	void add_collaboration(std::string actor_id);
 
-	bool operator<(const director &director2);
+	bool operator<(const director &director2) const;
 	director& operator=(const director &director);
 };
 #endif
