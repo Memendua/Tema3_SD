@@ -1,5 +1,7 @@
 #include <iterator>
 #include <string>
+#include <sstream>
+#include <iomanip>
 #include <vector>
 #include <unordered_map>
 #include <set>
@@ -30,15 +32,16 @@ void IMDb::add_movie(std::string movie_name,
 
     // Caut directorul in baza de date
     auto found_director = directors.find(director_name);
-    auto found_influence = directors_influence.find(found_director->second);
-
-    if (found_influence != directors_influence.end()) {
-        directors_influence.erase(found_influence);
-    }
 
     if (found_director == directors.end()) {
         std::pair<std::string, director> elem(director_name, director(director_name));
         found_director = directors.insert(elem).first;
+    } else {
+    	auto found_influence = directors_influence.find(found_director->second);
+
+	    if (found_influence != directors_influence.end()) {
+	        directors_influence.erase(found_influence);
+    	}
     }
 
     for (unsigned int i = 0; i < actor_ids.size(); ++i) {
@@ -84,7 +87,7 @@ void IMDb::add_user(std::string user_id, std::string name) {
 
 void IMDb::add_actor(std::string actor_id, std::string name) {
     // Idem add_user
-    actor new_actor(actor_id);
+    actor new_actor(actor_id, name);
     std::pair<std::string, actor> elem(actor_id, new_actor);
     actors.insert(elem);
 }
@@ -118,6 +121,7 @@ std::string IMDb::get_rating(std::string movie_id) {
 
         double rating;
         std::string final_rating;
+        std::stringstream stream;
         int temp_rating = (int)(movies[movie_id].get_rating() * 1000);
 
         if (temp_rating % 10 >= 5) {
@@ -126,9 +130,12 @@ std::string IMDb::get_rating(std::string movie_id) {
 
         temp_rating /= 10;
         rating = (double)temp_rating / 100.0;
-        final_rating = std::to_string(rating);
+        stream << std::fixed << std::setprecision(2) << rating;
+        final_rating = stream.str();
         return final_rating;
     }
+
+    return NONE;
 }
 
 std::string IMDb::get_longest_career_actor() {

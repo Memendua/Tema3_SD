@@ -82,7 +82,8 @@ actor::actor() {
 	this->years = 0;
 }
 
-actor::actor(std::string actor_id) {
+actor::actor(std::string actor_id, std::string actor_name) {
+	this->actor_name = actor_name;
 	this->actor_id = actor_id;
 	this->debut_year = INT_MAX;
 	this->last_year = INT_MIN;

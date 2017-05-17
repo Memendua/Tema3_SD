@@ -47,7 +47,7 @@ private:
 
 public:
 	actor();
-	actor(std::string actor_id);
+	actor(std::string actor_id, std::string actor_name);
 	actor(const actor &actor2);
 	~actor();
 
