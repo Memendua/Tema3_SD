@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <map>
 #include <set>
 
 #include "movie.h"
@@ -82,8 +83,8 @@ private:
     // Cheie: movie_id; Valoare: variabila de tip movie;
     std::unordered_map<std::string, movie> movies;
     // Filme sortate dupa an;
-    std::set<movie> recent_movies;
-    std::set<movie> rated_movies;
+    std::map<int, movie&> recent_movies;
+    std::map<int, movie&> rated_movies;
     std::set<movie, comp_by_ratings> popular_movies;
     // Cheie: actor_id; Valoare: variabila de tip actor;
     std::unordered_map<std::string, actor> actors;

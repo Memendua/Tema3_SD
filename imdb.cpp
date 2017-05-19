@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <set>
 #include <iostream>
+#include <limits.h>
 
 #include "include/imdb.h"
 
@@ -28,7 +29,7 @@ void IMDb::add_movie(std::string movie_name,
             actor_ids);
     std::pair<std::string, movie> elem(movie_id, m);
     movies.insert(elem);
-    recent_movies.insert(m);
+    recent_movies.emplace(timestamp, m);
 
 
     // Caut directorul in baza de date
@@ -83,9 +84,10 @@ void IMDb::add_actor(std::string actor_id, std::string name) {
 void IMDb::add_rating(std::string user_id, std::string movie_id, int rating) {
     // Curat cache-ul
     cache.clear();
-    double old_rating = movies[movie_id].add_rating(user_id, rating);
-    if (movies[movie_id].nr_ratings() == 1) {
-        rated_movies.insert(movies[movie_id]);
+    movie &current_movie = movies[movie_id];
+    double old_rating = current_movie.add_rating(user_id, rating);
+    if (current_movie.nr_ratings() == 1) {
+        rated_movies.emplace(current_movie.get_timestamp(), current_movie);
     }
 }
 
@@ -98,9 +100,10 @@ void IMDb::update_rating(std::string user_id, std::string movie_id, int rating) 
 void IMDb::remove_rating(std::string user_id, std::string movie_id) {
     // Curat cache-ul
     cache.clear();
-    double old_rating = movies[movie_id].remove_rating(user_id);
-    if (movies[movie_id].nr_ratings() == 0) {
-        rated_movies.erase(movies[movie_id]);
+    movie &current_movie = movies[movie_id];
+    double old_rating = current_movie.remove_rating(user_id);
+    if (current_movie.nr_ratings() == 0) {
+        rated_movies.erase(current_movie.get_timestamp());
     }
 }
 
@@ -158,11 +161,10 @@ std::string IMDb::get_top_k_most_recent_movies(int k) {
     if (!recent_movies.empty()) {
         int i = 1;
         auto it = recent_movies.rbegin();
-        std::string result = it->get_movie_id();
+        std::string result = it->second.get_movie_id();
         ++it;
         for (it = it; i < k && it != recent_movies.rend(); ++it, ++i) {
-
-            result += " " + it->get_movie_id();
+            result += " " + it->second.get_movie_id();
         }
         return result;
     }
@@ -185,27 +187,32 @@ std::string IMDb::get_top_k_most_popular_movies(int k) {
 std::string IMDb::get_avg_rating_in_range(int start, int end) {
     double rating = 0.0;
     int number_of_ratings = 0;
-    movie m_begin(start);
-    movie m_end(end);
-    auto lower = rated_movies.lower_bound(m_begin);
-    auto upper = rated_movies.upper_bound(m_end);
-    int lower_time = lower->get_timestamp();
-    int upper_time = upper->get_timestamp();
+    // movie m_begin(start);
+    // movie m_end(end);
+    auto lower = rated_movies.lower_bound(start);
+    auto upper = rated_movies.upper_bound(end);
+
+    if (lower == upper) {
+        return NONE;   
+    }
+
+    int lower_time = lower->second.get_timestamp();
+    int upper_time;
     
+    if (upper == rated_movies.end()) {
+        upper_time = INT_MAX;
+    } else {
+        upper_time = upper->second.get_timestamp();
+    }
+
     if (cache.find(lower_time) != cache.end()) {
         if (cache[lower_time].find(upper_time) != cache[lower_time].end()) {
             return cache[lower_time][upper_time];
         }
     }
 
-    if (lower == upper) {
-        cache[lower_time][upper_time] = NONE;
-        return NONE;   
-    }
-
     for (auto it = lower; it != upper; ++it) {
-        std::string movie_id = it->get_movie_id();
-        rating += movies[movie_id].get_rating();
+        rating += it->second.get_rating();
         ++number_of_ratings;
     }
 
