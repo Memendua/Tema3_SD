@@ -37,17 +37,17 @@ public:
 };
 
 struct comp_ratings {
-    bool operator() (const movie &movie1, const movie &movie2) const {
-        if (movie1.no_ratings() < movie2.no_ratings()) {
-            return true;
-        } else if (movie1.no_ratings() == movie2.no_ratings()) {
-            if (movie1.get_movie_id() < movie2.get_movie_id()) {
-                return true;
-            }
-        }
+	bool operator()(const movie &movie1, const movie &movie2) {
+    	if (movie1.no_ratings() < movie2.no_ratings()) {
+        	return true;
+    	} else if (movie1.no_ratings() == movie2.no_ratings()) {
+        	if (movie1.get_movie_id() > movie2.get_movie_id()) {
+            	return true;
+        	}
+    	}
 
-    return false;
-    }
+    	return false;
+	}
 };
 
 #endif

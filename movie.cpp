@@ -81,6 +81,6 @@ std::string movie::get_movie_id() const {
 	return movie_id;
 }
 
-int movie::no_ratings() {
+int movie::no_ratings() const {
 	return ratings.size();
 }

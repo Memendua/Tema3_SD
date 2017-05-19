@@ -6,7 +6,10 @@
 #include <unordered_map>
 #include <set>
 
-#include "structs.h"
+#include "movie.h"
+#include "actor.h"
+#include "director.h"
+#include "categories.h"
 
 #define NONE                            "none"
 
@@ -67,29 +70,16 @@ private:
     // Filme sortate dupa an;
     std::set<movie> recent_movies;
     std::set<movie> rated_movies;
-    std::set<movie, comp_by_ratings> popular_movies;
+    // Filme sortate dupa numarul de rating-uri;
+    std::set<movie, comp_ratings> popular_movies;
     // Cheie: actor_id; Valoare: variabila de tip actor;
     std::unordered_map<std::string, actor> actors;
-    // Actori sortati dupa anii de cariera;
-    std::set<actor> actors_career;
+    actor max_years;
     // Cheie: nume director; Valoare: variabila de tip director;
     std::unordered_map<std::string, director> directors;
-    // Directori sortati dupa numarul de colaborari;
-    std::set<director> directors_influence;
+    director max_coll;
     // Cheie: user_id; Valoare: user_name;
     std::unordered_map<std::string, std::string> users;
 };
-
-bool comp_by_ratings(const movie &movie1, const movie &movie2) {
-    if (movie1.no_ratings() < movie2.no_ratings()) {
-        return true;
-    } else if (movie1.no_ratings() == movie2.no_ratings()) {
-        if (movie1.get_movie_id() > movie2.get_movie_id()) {
-            return true;
-        }
-    }
-
-    return false;
-}
 
 #endif

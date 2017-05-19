@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <set>
+#include <iostream>
 
 #include "imdb.h"
 
@@ -28,6 +29,7 @@ void IMDb::add_movie(std::string movie_name,
     std::pair<std::string, movie> elem(movie_id, m);
     movies.insert(elem);
     recent_movies.insert(m);
+    popular_movies.insert(m);
 
 
     // Caut directorul in baza de date
@@ -36,12 +38,6 @@ void IMDb::add_movie(std::string movie_name,
     if (found_director == directors.end()) {
         std::pair<std::string, director> elem(director_name, director(director_name));
         found_director = directors.insert(elem).first;
-    } else {
-    	auto found_influence = directors_influence.find(found_director->second);
-
-	    if (found_influence != directors_influence.end()) {
-	        directors_influence.erase(found_influence);
-    	}
     }
 
     for (unsigned int i = 0; i < actor_ids.size(); ++i) {
@@ -60,22 +56,18 @@ void IMDb::add_movie(std::string movie_name,
         }
 
         years = last_year - debut_year;
-        auto found_actor = actors_career.find(current_actor);
-
-        if (found_actor != actors_career.end()) {
-            // Daca actorul este deja in ABC, il sterg si il adaug din nou
-            // cu noul numar de ani
-            actors_career.erase(found_actor);
+        if (max_years < current_actor || max_years.get_id() == "") {
+            max_years = current_actor;
         }
-        // Adaug actorul in ABC acum ca a participat in cel putin un film
-        actors_career.insert(current_actor);
 
         if (!found_director->second.check_collaboration(actor_ids[i])) {
             found_director->second.add_collaboration(actor_ids[i]);
         }
     }
 
-    directors_influence.insert(found_director->second);
+    if (max_coll < found_director->second) {
+        max_coll = found_director->second;
+    }
 }
 
 void IMDb::add_user(std::string user_id, std::string name) {
@@ -100,7 +92,7 @@ void IMDb::add_rating(std::string user_id, std::string movie_id, int rating) {
 
 void IMDb::update_rating(std::string user_id, std::string movie_id, int rating) {
     if (movies.find(movie_id) != movies.end()) {
-        movies[movie_id].update_rating(user_id, rating);
+        double old_rating = movies[movie_id].update_rating(user_id, rating);
     }
 }
 
@@ -114,9 +106,6 @@ void IMDb::remove_rating(std::string user_id, std::string movie_id) {
 }
 
 std::string IMDb::get_rating(std::string movie_id) {
-    // Am pus conditia de fara rating la inceput
-    // Nu ai tratat cazul de rotunjire pt %10 < 5
-    // Am scos operatiile ce se repeta din if
     if (movies.find(movie_id) != movies.end()) {
         if (movies[movie_id].no_ratings()) {
             return NONE;
@@ -142,20 +131,15 @@ std::string IMDb::get_rating(std::string movie_id) {
 }
 
 std::string IMDb::get_longest_career_actor() {
-    if (!actors_career.empty()) {
-        auto iter = actors_career.begin();
-        actor current_actor = *iter;
-
-        return current_actor.get_id();
+    if (max_years.get_id() != "") {
+        return max_years.get_id();
     }
     return NONE;
 }
 
 std::string IMDb::get_most_influential_director() {
-    if (!directors_influence.empty()) {
-        auto iter = directors_influence.begin();
-        
-        return iter->director_name;
+    if (max_coll.director_name != "") {
+        return max_coll.director_name;
     }
     return NONE;
 }
@@ -193,7 +177,18 @@ std::string IMDb::get_top_k_partners_for_actor(int k, std::string actor_id) {
 }
 
 std::string IMDb::get_top_k_most_popular_movies(int k) {
-    return "";
+    if (!popular_movies.empty()) {
+        int i = 1;
+        auto it = popular_movies.rbegin();
+        std::string result = it->get_movie_id();
+        ++it;
+        for (it = it; i < k && it != popular_movies.rend(); ++it, ++i) {
+            result += " " + it->get_movie_id();
+        }
+        return result;
+    }
+
+    return NONE;
 }
 
 std::string IMDb::get_avg_rating_in_range(int start, int end) {
@@ -210,10 +205,8 @@ std::string IMDb::get_avg_rating_in_range(int start, int end) {
 
     for (auto it = lower; it != upper; ++it) {
         std::string movie_id = it->get_movie_id();
-        if (!movies[movie_id].no_ratings()) {
-            rating += movies[movie_id].get_rating();
-            ++number_of_ratings;
-        }
+        rating += movies[movie_id].get_rating();
+        ++number_of_ratings;
     }
 
     if (number_of_ratings) {
