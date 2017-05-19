@@ -7,7 +7,7 @@
 #include <set>
 #include <iostream>
 
-#include "imdb.h"
+#include "include/imdb.h"
 
 
 IMDb::IMDb() {
@@ -81,26 +81,26 @@ void IMDb::add_actor(std::string actor_id, std::string name) {
 }
 
 void IMDb::add_rating(std::string user_id, std::string movie_id, int rating) {
-    if (movies.find(movie_id) != movies.end()) {
-        double old_rating = movies[movie_id].add_rating(user_id, rating);
-        if (!movies[movie_id].no_ratings()) {
-            rated_movies.insert(movies[movie_id]);
-        }
+    // Curat cache-ul
+    cache.clear();
+    double old_rating = movies[movie_id].add_rating(user_id, rating);
+    if (movies[movie_id].nr_ratings() == 1) {
+        rated_movies.insert(movies[movie_id]);
     }
 }
 
 void IMDb::update_rating(std::string user_id, std::string movie_id, int rating) {
-    if (movies.find(movie_id) != movies.end()) {
-        double old_rating = movies[movie_id].update_rating(user_id, rating);
-    }
+    // Curat cache-ul
+    cache.clear();
+    double old_rating = movies[movie_id].update_rating(user_id, rating);
 }
 
 void IMDb::remove_rating(std::string user_id, std::string movie_id) {
-    if (movies.find(movie_id) != movies.end()) {
-        double old_rating = movies[movie_id].remove_rating(user_id);
-        if (movies[movie_id].no_ratings() == 1) {
-            rated_movies.insert(movies[movie_id]);
-        }
+    // Curat cache-ul
+    cache.clear();
+    double old_rating = movies[movie_id].remove_rating(user_id);
+    if (movies[movie_id].nr_ratings() == 0) {
+        rated_movies.erase(movies[movie_id]);
     }
 }
 
@@ -109,7 +109,7 @@ std::string IMDb::get_rating(std::string movie_id) {
     // Nu ai tratat cazul de rotunjire pt %10 < 5
     // Am scos operatiile ce se repeta din if
     if (movies.find(movie_id) != movies.end()) {
-        if (movies[movie_id].no_ratings()) {
+        if (!movies[movie_id].nr_ratings()) {
             return NONE;
         }
 
@@ -189,29 +189,34 @@ std::string IMDb::get_avg_rating_in_range(int start, int end) {
     movie m_end(end);
     auto lower = rated_movies.lower_bound(m_begin);
     auto upper = rated_movies.upper_bound(m_end);
+    int lower_time = lower->get_timestamp();
+    int upper_time = upper->get_timestamp();
     
+    if (cache.find(lower_time) != cache.end()) {
+        if (cache[lower_time].find(upper_time) != cache[lower_time].end()) {
+            return cache[lower_time][upper_time];
+        }
+    }
+
     if (lower == upper) {
+        cache[lower_time][upper_time] = NONE;
         return NONE;   
     }
 
     for (auto it = lower; it != upper; ++it) {
         std::string movie_id = it->get_movie_id();
-        if (!movies[movie_id].no_ratings()) {
-            rating += movies[movie_id].get_rating();
-            ++number_of_ratings;
-        }
+        rating += movies[movie_id].get_rating();
+        ++number_of_ratings;
     }
 
-    if (number_of_ratings) {
-        rating /= number_of_ratings;
-        std::stringstream stream;
-        std::string result;
+    rating /= number_of_ratings;
+    std::stringstream stream;
+    std::string result;
 
-        stream << std::fixed << std::setprecision(2) << rating;
-        result = stream.str();
+    stream << std::fixed << std::setprecision(2) << rating;
+    result = stream.str();
 
-        return result;
-    } else {
-        return NONE;
-    }
+    cache[lower_time][upper_time] = result;
+    return result;
+
 }

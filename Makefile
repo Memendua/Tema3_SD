@@ -5,8 +5,9 @@
 
 CC=g++
 DEBUG=-g
-CFLAGS=-Wall -Wextra $(DEBUG) -std=c++11
+CFLAGS=-Wall -Wextra -std=c++11
 EXEC=imdb
+OUTPUT=output
 
 build:
 	$(CC) $(CFLAGS) *.cpp -o $(EXEC)
@@ -15,6 +16,6 @@ run:
 	./$(EXEC)
 
 clean:
-	rm $(EXEC)
+	rm $(EXEC) $(OUTPUT)
 
 .PHONY: build run clean
