@@ -29,7 +29,6 @@ void IMDb::add_movie(std::string movie_name,
     std::pair<std::string, movie> elem(movie_id, m);
     movies.insert(elem);
     recent_movies.insert(m);
-    popular_movies.insert(m);
 
 
     // Caut directorul in baza de date
@@ -106,6 +105,9 @@ void IMDb::remove_rating(std::string user_id, std::string movie_id) {
 }
 
 std::string IMDb::get_rating(std::string movie_id) {
+    // Am pus conditia de fara rating la inceput
+    // Nu ai tratat cazul de rotunjire pt %10 < 5
+    // Am scos operatiile ce se repeta din if
     if (movies.find(movie_id) != movies.end()) {
         if (!movies[movie_id].nr_ratings()) {
             return NONE;
@@ -177,18 +179,7 @@ std::string IMDb::get_top_k_partners_for_actor(int k, std::string actor_id) {
 }
 
 std::string IMDb::get_top_k_most_popular_movies(int k) {
-    if (!popular_movies.empty()) {
-        int i = 1;
-        auto it = popular_movies.rbegin();
-        std::string result = it->get_movie_id();
-        ++it;
-        for (it = it; i < k && it != popular_movies.rend(); ++it, ++i) {
-            result += " " + it->get_movie_id();
-        }
-        return result;
-    }
-
-    return NONE;
+    return "";
 }
 
 std::string IMDb::get_avg_rating_in_range(int start, int end) {
