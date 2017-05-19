@@ -6,10 +6,7 @@
 #include <unordered_map>
 #include <set>
 
-#include "movie.h"
-#include "actor.h"
-#include "director.h"
-#include "categories.h"
+#include "structs.h"
 
 #define NONE                            "none"
 
@@ -73,10 +70,12 @@ private:
     std::set<movie, comp_by_ratings> popular_movies;
     // Cheie: actor_id; Valoare: variabila de tip actor;
     std::unordered_map<std::string, actor> actors;
-    actor max_years;
+    // Actori sortati dupa anii de cariera;
+    std::set<actor> actors_career;
     // Cheie: nume director; Valoare: variabila de tip director;
     std::unordered_map<std::string, director> directors;
-    director max_coll;
+    // Directori sortati dupa numarul de colaborari;
+    std::set<director> directors_influence;
     // Cheie: user_id; Valoare: user_name;
     std::unordered_map<std::string, std::string> users;
 };

@@ -5,7 +5,6 @@
 #include <vector>
 #include <unordered_map>
 #include <set>
-#include <iostream>
 
 #include "imdb.h"
 
@@ -37,6 +36,12 @@ void IMDb::add_movie(std::string movie_name,
     if (found_director == directors.end()) {
         std::pair<std::string, director> elem(director_name, director(director_name));
         found_director = directors.insert(elem).first;
+    } else {
+    	auto found_influence = directors_influence.find(found_director->second);
+
+	    if (found_influence != directors_influence.end()) {
+	        directors_influence.erase(found_influence);
+    	}
     }
 
     for (unsigned int i = 0; i < actor_ids.size(); ++i) {
@@ -55,18 +60,22 @@ void IMDb::add_movie(std::string movie_name,
         }
 
         years = last_year - debut_year;
-        if (max_years < current_actor || max_years.get_id() == "") {
-            max_years = current_actor;
+        auto found_actor = actors_career.find(current_actor);
+
+        if (found_actor != actors_career.end()) {
+            // Daca actorul este deja in ABC, il sterg si il adaug din nou
+            // cu noul numar de ani
+            actors_career.erase(found_actor);
         }
+        // Adaug actorul in ABC acum ca a participat in cel putin un film
+        actors_career.insert(current_actor);
 
         if (!found_director->second.check_collaboration(actor_ids[i])) {
             found_director->second.add_collaboration(actor_ids[i]);
         }
     }
 
-    if (max_coll < found_director->second) {
-        max_coll = found_director->second;
-    }
+    directors_influence.insert(found_director->second);
 }
 
 void IMDb::add_user(std::string user_id, std::string name) {
@@ -91,7 +100,7 @@ void IMDb::add_rating(std::string user_id, std::string movie_id, int rating) {
 
 void IMDb::update_rating(std::string user_id, std::string movie_id, int rating) {
     if (movies.find(movie_id) != movies.end()) {
-        double old_rating = movies[movie_id].update_rating(user_id, rating);
+        movies[movie_id].update_rating(user_id, rating);
     }
 }
 
@@ -133,15 +142,20 @@ std::string IMDb::get_rating(std::string movie_id) {
 }
 
 std::string IMDb::get_longest_career_actor() {
-    if (max_years.get_id() != "") {
-        return max_years.get_id();
+    if (!actors_career.empty()) {
+        auto iter = actors_career.begin();
+        actor current_actor = *iter;
+
+        return current_actor.get_id();
     }
     return NONE;
 }
 
 std::string IMDb::get_most_influential_director() {
-    if (max_coll.director_name != "") {
-        return max_coll.director_name;
+    if (!directors_influence.empty()) {
+        auto iter = directors_influence.begin();
+        
+        return iter->director_name;
     }
     return NONE;
 }
