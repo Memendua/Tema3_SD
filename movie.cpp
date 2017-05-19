@@ -66,11 +66,15 @@ double movie::remove_rating(std::string user_id) {
 }
 
 bool movie::operator<(const movie &movie2) const {
-	if (this->timestamp < movie2.timestamp) {
-		return true;
-	}
+    if (this->nr_ratings() < movie2.nr_ratings()) {
+        return true;
+    } else if (this->nr_ratings() == movie2.nr_ratings()) {
+        if (this->get_movie_id() > movie2.get_movie_id()) {
+            return true;
+        }
+    }
 
-	return false;
+    return false;
 }
 
 double movie::get_rating() const {

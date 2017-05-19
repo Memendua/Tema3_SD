@@ -29,7 +29,7 @@ void IMDb::add_movie(std::string movie_name,
             actor_ids);
     std::pair<std::string, movie> elem(movie_id, m);
     movies.insert(elem);
-    recent_movies.emplace(timestamp, m);
+    recent_movies.emplace(timestamp, movies[movie_id]);
 
 
     // Caut directorul in baza de date
@@ -181,7 +181,36 @@ std::string IMDb::get_top_k_partners_for_actor(int k, std::string actor_id) {
 }
 
 std::string IMDb::get_top_k_most_popular_movies(int k) {
-    return "";
+    if (movies.size()) {
+        std::set<movie> popular_movies;
+        auto it = movies.begin();
+        for (it = it; it != movies.end() && popular_movies.size() < k; ++it) {
+            popular_movies.insert(it->second);
+        }
+
+        if (k == popular_movies.size()) {
+            auto lowest = popular_movies.begin();
+            for (it = it; it !=movies.end(); ++it) {
+                if (*lowest < it->second) {
+                    popular_movies.erase(lowest);
+                    popular_movies.insert(it->second);
+                    lowest = popular_movies.begin();
+                }
+            }
+        }
+
+        std::string result;
+        auto it2 = popular_movies.rbegin();
+        result += it2->get_movie_id();
+        for (it2 = it2; it2 != popular_movies.rend(); ++it2) {
+            result += " " + it2->get_movie_id();
+        }
+
+        return result;
+    }
+
+    return NONE;
+    //return "";
 }
 
 std::string IMDb::get_avg_rating_in_range(int start, int end) {

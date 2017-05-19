@@ -33,19 +33,6 @@
 #define GET_AVG_RATING_IN_RANGE         "get_avg_rating_in_range"
 
 
-struct comp_by_ratings {
-    bool operator() (const movie &movie1, const movie &movie2) const {
-        if (movie1.nr_ratings() < movie2.nr_ratings()) {
-            return true;
-        } else if (movie1.nr_ratings() == movie2.nr_ratings()) {
-            if (movie1.get_movie_id() > movie2.get_movie_id()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-};
 
 class IMDb {
 public:
@@ -85,7 +72,6 @@ private:
     // Filme sortate dupa an;
     std::map<int, movie&> recent_movies;
     std::map<int, movie&> rated_movies;
-    std::set<movie, comp_by_ratings> popular_movies;
     // Cheie: actor_id; Valoare: variabila de tip actor;
     std::unordered_map<std::string, actor> actors;
     actor max_years;
