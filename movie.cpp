@@ -85,6 +85,10 @@ std::string movie::get_movie_id() const {
 	return movie_id;
 }
 
+<<<<<<< HEAD
 int movie::nr_ratings() const {
+=======
+int movie::no_ratings() const {
+>>>>>>> f2b7b2d385d9df1577475a850575a909706fe6ee
 	return ratings.size();
 }

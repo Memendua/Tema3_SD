@@ -31,9 +31,23 @@ public:
     double get_rating() const;
     std::string get_movie_id() const;
 
-    int no_ratings();
+    int no_ratings() const;
 
     bool operator<(const movie &movie1) const;
+};
+
+struct comp_ratings {
+	bool operator()(const movie &movie1, const movie &movie2) {
+    	if (movie1.no_ratings() < movie2.no_ratings()) {
+        	return true;
+    	} else if (movie1.no_ratings() == movie2.no_ratings()) {
+        	if (movie1.get_movie_id() > movie2.get_movie_id()) {
+            	return true;
+        	}
+    	}
+
+    	return false;
+	}
 };
 
 #endif
