@@ -28,7 +28,7 @@ void IMDb::add_movie(std::string movie_name,
             actor_ids);
     std::pair<std::string, movie> elem(movie_id, m);
     movies.insert(elem);
-    top_movies.insert(m);
+    recent_movies.insert(m);
 
 
     // Caut directorul in baza de date
@@ -70,14 +70,11 @@ void IMDb::add_movie(std::string movie_name,
 }
 
 void IMDb::add_user(std::string user_id, std::string name) {
-    // Vezi ca ai overload pe operatorul [] care iti creaza elementul
-    // daca el deja nu exista, e mai usor asa.
     std::pair<std::string, std::string> user(user_id, name);
     users.insert(user);
 }
 
 void IMDb::add_actor(std::string actor_id, std::string name) {
-    // Idem add_user
     actor new_actor(actor_id, name);
     std::pair<std::string, actor> elem(actor_id, new_actor);
     actors.insert(elem);
@@ -86,6 +83,9 @@ void IMDb::add_actor(std::string actor_id, std::string name) {
 void IMDb::add_rating(std::string user_id, std::string movie_id, int rating) {
     if (movies.find(movie_id) != movies.end()) {
         double old_rating = movies[movie_id].add_rating(user_id, rating);
+        if (!movies[movie_id].no_ratings()) {
+            rated_movies.insert(movies[movie_id]);
+        }
     }
 }
 
@@ -98,6 +98,9 @@ void IMDb::update_rating(std::string user_id, std::string movie_id, int rating) 
 void IMDb::remove_rating(std::string user_id, std::string movie_id) {
     if (movies.find(movie_id) != movies.end()) {
         double old_rating = movies[movie_id].remove_rating(user_id);
+        if (movies[movie_id].no_ratings() == 1) {
+            rated_movies.insert(movies[movie_id]);
+        }
     }
 }
 
@@ -152,12 +155,12 @@ std::string IMDb::get_2nd_degree_colleagues(std::string actor_id) {
 }
 
 std::string IMDb::get_top_k_most_recent_movies(int k) {
-    if (!top_movies.empty()) {
+    if (!recent_movies.empty()) {
         int i = 1;
-        auto it = top_movies.rbegin();
+        auto it = recent_movies.rbegin();
         std::string result = it->get_movie_id();
         ++it;
-        for (it = it; i < k && it != top_movies.rend(); ++it, ++i) {
+        for (it = it; i < k && it != recent_movies.rend(); ++it, ++i) {
 
             result += " " + it->get_movie_id();
         }
@@ -184,8 +187,8 @@ std::string IMDb::get_avg_rating_in_range(int start, int end) {
     int number_of_ratings = 0;
     movie m_begin(start);
     movie m_end(end);
-    auto lower = top_movies.lower_bound(m_begin);
-    auto upper = top_movies.upper_bound(m_end);
+    auto lower = rated_movies.lower_bound(m_begin);
+    auto upper = rated_movies.upper_bound(m_end);
     
     if (lower == upper) {
         return NONE;   

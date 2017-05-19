@@ -6,7 +6,6 @@
 
 movie::movie() {
 	this->rating = 0;
-	this->nr_ratings = 0;
 }
 
 movie::movie(int timestamp) {
@@ -14,7 +13,6 @@ movie::movie(int timestamp) {
 	this->movie_id = "";
 	this->timestamp = timestamp;
 	this->rating = 0;
-	this->nr_ratings = 0;
 }
 
 movie::movie(std::string movie_name, std::string movie_id, int timestamp,
@@ -27,7 +25,6 @@ movie::movie(std::string movie_name, std::string movie_id, int timestamp,
 	this->director_name = director_name;
 	this->actor_ids = actor_ids;
 	this->rating = 0;
-	this->nr_ratings = 0;
 }
 
 movie::~movie() {};
@@ -36,10 +33,9 @@ double movie::add_rating(std::string user_id, int rating) {
 	if (ratings.find(user_id) == ratings.end()) {
 		double old_rating = this->rating;
 		ratings[user_id] = rating;
-		this->rating *= this->nr_ratings;
-		++this->nr_ratings;
+		this->rating *= this->ratings.size();
 		this->rating += rating;
-		this->rating /= this->nr_ratings;
+		this->rating /= this->ratings.size();
 		return old_rating;
 	}
 	return 0;
@@ -47,23 +43,22 @@ double movie::add_rating(std::string user_id, int rating) {
 
 double movie::update_rating(std::string user_id, int rating) {
 	double old_rating = this->rating;
-	this->rating *= this->nr_ratings;
+	this->rating *= this->ratings.size();
 	this->rating -= ratings[user_id];
 	ratings[user_id] = rating;
 	this->rating += rating;
-	this->rating /= nr_ratings;
-	return old_rating
+	this->rating /= ratings.size();
+	return old_rating;
 }
 
 double movie::remove_rating(std::string user_id) {
 	double old_rating = this->rating;
-	this->rating *= this->nr_ratings;
+	this->rating *= this->ratings.size();
 	this->rating -= ratings[user_id];
 	ratings.erase(user_id);
-	--this->nr_ratings;
 
-	if (this->nr_ratings) {
-		this->rating /= nr_ratings;
+	if (ratings.size()) {
+		this->rating /= ratings.size();
 	} else {
 		this->rating = 0;
 	}
@@ -86,6 +81,6 @@ std::string movie::get_movie_id() const {
 	return movie_id;
 }
 
-bool movie::no_ratings() {
-	return nr_ratings ? false : true;
+int movie::no_ratings() {
+	return ratings.size();
 }

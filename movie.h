@@ -9,7 +9,6 @@ class movie {
 private:
 	int timestamp;
 	double rating;
-	int nr_ratings;
 	std::string movie_name;
 	std::string movie_id;
 	std::string director_name;
@@ -32,7 +31,7 @@ public:
     double get_rating() const;
     std::string get_movie_id() const;
 
-    bool no_ratings();
+    int no_ratings();
 
     bool operator<(const movie &movie1) const;
 };
