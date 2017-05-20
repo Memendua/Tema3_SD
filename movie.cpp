@@ -65,6 +65,14 @@ double movie::remove_rating(std::string user_id) {
 	return old_rating;
 }
 
+void movie::set_position(int position) {
+	this->position = position;
+}
+
+void movie::set_rating_until_this(double prev_rating) {
+	this->rating_until_this = this->rating + prev_rating;
+}
+
 bool movie::operator<(const movie &movie2) const {
     if (this->nr_ratings() < movie2.nr_ratings()) {
         return true;
@@ -81,8 +89,16 @@ double movie::get_rating() const {
 	return this->rating;
 }
 
+double movie::get_rating_until_this() const {
+	return this->rating_until_this;
+}
+
 int movie::get_timestamp() const {
 	return this->timestamp;
+}
+
+int movie::get_position() const {
+	return this->position;
 }
 
 std::string movie::get_movie_id() const {

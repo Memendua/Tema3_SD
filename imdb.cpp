@@ -13,6 +13,7 @@
 
 IMDb::IMDb() {
     // initialize what you need here.
+    rated_movies_up_to_date = false;
 }
 
 IMDb::~IMDb() {}
@@ -85,8 +86,8 @@ void IMDb::add_actor(std::string actor_id, std::string name) {
 }
 
 void IMDb::add_rating(std::string user_id, std::string movie_id, int rating) {
-    // Curat cache-ul
-    cache.clear();
+    // Rating-ul se modifica, trebuie modificat map-ul de recent_movies
+    rated_movies_up_to_date = false;
     // Se schimba topul de popularitate
     popular_movies.clear();
     movie &current_movie = movies[movie_id];
@@ -97,14 +98,14 @@ void IMDb::add_rating(std::string user_id, std::string movie_id, int rating) {
 }
 
 void IMDb::update_rating(std::string user_id, std::string movie_id, int rating) {
-    // Curat cache-ul
-    cache.clear();
+    // Rating-ul se modifica, trebuie modificat map-ul de recent_movies
+    rated_movies_up_to_date = false;
     double old_rating = movies[movie_id].update_rating(user_id, rating);
 }
 
 void IMDb::remove_rating(std::string user_id, std::string movie_id) {
-    // Curat cache-ul
-    cache.clear();
+    // Rating-ul se modifica, trebuie modificat map-ul de recent_movies
+    rated_movies_up_to_date = false;
     // Se schimba topul de popularitate
     popular_movies.clear();
     movie &current_movie = movies[movie_id];
@@ -115,9 +116,6 @@ void IMDb::remove_rating(std::string user_id, std::string movie_id) {
 }
 
 std::string IMDb::get_rating(std::string movie_id) {
-    // Am pus conditia de fara rating la inceput
-    // Nu ai tratat cazul de rotunjire pt %10 < 5
-    // Am scos operatiile ce se repeta din if
     if (movies.find(movie_id) != movies.end()) {
         if (!movies[movie_id].nr_ratings()) {
             return NONE;
@@ -213,41 +211,62 @@ std::string IMDb::get_top_k_most_popular_movies(int k) {
 std::string IMDb::get_avg_rating_in_range(int start, int end) {
     double rating = 0.0;
     int number_of_ratings = 0;
+
+    if (rated_movies.empty()) {  // Daca nu exista filme cu rating, afisez none
+        return NONE;
+    }
+
+    if (!rated_movies_up_to_date) {
+        // Daca rated_movies nu e up to date, il updatez
+        auto it = rated_movies.begin();
+        int i = 1;
+        
+        // Primul element are suma rating-urilor egala cu rating-ul lui
+        it->second.set_position(i++);
+        it->second.set_rating_until_this(rating);
+        rating = it->second.get_rating_until_this();
+        ++it;
+
+        for (it = it; it != rated_movies.end(); ++it) {
+            // La urmatoarele elemente, suma rating-urilor este egala cu suma
+            // rating-urilor elementului anterior + rating-ul sau
+            it->second.set_position(i++);
+            it->second.set_rating_until_this(rating);
+            rating = it->second.get_rating_until_this();
+        }
+        rated_movies_up_to_date = true;  // rated_movies este acum up to date
+    }
+
+    // Cautare binara a intervalului din rated_movies in care se afla
+    // elementele dintre start si end
     auto lower = rated_movies.lower_bound(start);
     auto upper = rated_movies.upper_bound(end);
 
-    if (lower == upper) {
-        return NONE;   
+    if (lower == upper) {  // Daca nu am elemente in intervalul (start, end)
+        return NONE;
     }
 
-    int lower_time = lower->second.get_timestamp();
-    int upper_time;
-    
-    if (upper == rated_movies.end()) {
-        upper_time = INT_MAX;
-    } else {
-        upper_time = upper->second.get_timestamp();
-    }
+    --upper;  // Pun iteratorul upper pe ultimul element din interval
 
-    if (cache.find(lower_time) != cache.end()) {
-        if (cache[lower_time].find(upper_time) != cache[lower_time].end()) {
-            return cache[lower_time][upper_time];
-        }
-    }
-
-    for (auto it = lower; it != upper; ++it) {
-        rating += it->second.get_rating();
-        ++number_of_ratings;
-    }
+    // Rating-ul este suma rating-urilor pana la ultimul element din interval
+    // scazut cu suma rating-urilor pana la primului element din interval si
+    // adunat cu rating-ul primului element (Deoarece a fost scazut), totul
+    // impartit la numarul de rating-uri.
+    rating = upper->second.get_rating_until_this() + lower->second.get_rating()
+            - lower->second.get_rating_until_this();
+    // Intr-un interval [a, b] sunt b - a + 1 elemente, deci numarul de
+    // rating-uri este pozitia ultimului - pozitia primului + 1
+    number_of_ratings = upper->second.get_position() + 1
+                       - lower->second.get_position();
 
     rating /= number_of_ratings;
+
+    // Aproximez la 2 zecimale
     std::stringstream stream;
     std::string result;
 
     stream << std::fixed << std::setprecision(2) << rating;
     result = stream.str();
 
-    cache[lower_time][upper_time] = result;
     return result;
-
 }
