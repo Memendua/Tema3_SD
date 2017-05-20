@@ -82,6 +82,7 @@ private:
     std::unordered_map<std::string, std::string> users;
     // Cache pentru get_average_rating_in_range
     std::unordered_map<int, std::unordered_map<int, std::string> > cache;
+    std::set<movie> popular_movies;
 };
 
 #endif

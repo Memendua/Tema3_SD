@@ -31,6 +31,9 @@ void IMDb::add_movie(std::string movie_name,
     movies.insert(elem);
     recent_movies.emplace(timestamp, movies[movie_id]);
 
+    // Se schimba topul de popularitate
+    popular_movies.clear();
+
 
     // Caut directorul in baza de date
     auto found_director = directors.find(director_name);
@@ -84,6 +87,8 @@ void IMDb::add_actor(std::string actor_id, std::string name) {
 void IMDb::add_rating(std::string user_id, std::string movie_id, int rating) {
     // Curat cache-ul
     cache.clear();
+    // Se schimba topul de popularitate
+    popular_movies.clear();
     movie &current_movie = movies[movie_id];
     double old_rating = current_movie.add_rating(user_id, rating);
     if (current_movie.nr_ratings() == 1) {
@@ -100,6 +105,8 @@ void IMDb::update_rating(std::string user_id, std::string movie_id, int rating) 
 void IMDb::remove_rating(std::string user_id, std::string movie_id) {
     // Curat cache-ul
     cache.clear();
+    // Se schimba topul de popularitate
+    popular_movies.clear();
     movie &current_movie = movies[movie_id];
     double old_rating = current_movie.remove_rating(user_id);
     if (current_movie.nr_ratings() == 0) {
@@ -181,43 +188,31 @@ std::string IMDb::get_top_k_partners_for_actor(int k, std::string actor_id) {
 }
 
 std::string IMDb::get_top_k_most_popular_movies(int k) {
-    if (movies.size()) {
-        std::set<movie> popular_movies;
-        auto it = movies.begin();
-        for (it = it; it != movies.end() && popular_movies.size() < k; ++it) {
+    if (popular_movies.empty()) {
+        for (auto it = movies.begin(); it != movies.end(); ++it) {
             popular_movies.insert(it->second);
         }
-
-        if (k == popular_movies.size()) {
-            auto lowest = popular_movies.begin();
-            for (it = it; it !=movies.end(); ++it) {
-                if (*lowest < it->second) {
-                    popular_movies.erase(lowest);
-                    popular_movies.insert(it->second);
-                    lowest = popular_movies.begin();
-                }
-            }
-        }
-
-        std::string result;
-        auto it2 = popular_movies.rbegin();
-        result += it2->get_movie_id();
-        for (it2 = it2; it2 != popular_movies.rend(); ++it2) {
-            result += " " + it2->get_movie_id();
-        }
-
-        return result;
     }
 
-    return NONE;
-    //return "";
+    if (popular_movies.empty()) {
+        return NONE;
+    }
+
+    auto it = popular_movies.rbegin();
+    std::string result = it->get_movie_id();
+    ++it;
+    --k;
+
+    for (it = it; it != popular_movies.rend() && k; ++it, --k) {
+        result += " " + it->get_movie_id();
+    }
+
+    return result;
 }
 
 std::string IMDb::get_avg_rating_in_range(int start, int end) {
     double rating = 0.0;
     int number_of_ratings = 0;
-    // movie m_begin(start);
-    // movie m_end(end);
     auto lower = rated_movies.lower_bound(start);
     auto upper = rated_movies.upper_bound(end);
 
