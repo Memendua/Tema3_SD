@@ -84,6 +84,10 @@ private:
     std::set<movie> popular_movies;
     // Variabila ce verifica daca rated_movies trebuie modificat sau nu
     bool rated_movies_up_to_date;
+    // Variabila ce determina daca un actor a fost adaugat;
+    bool checked_actor;
+    // Variabila ce verifica daca un actor nu a fost adaugat;
+    bool unchecked;
 };
 
 #endif

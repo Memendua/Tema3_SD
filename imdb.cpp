@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <vector>
 #include <unordered_map>
+#include <map>
 #include <set>
 #include <iostream>
 #include <limits.h>
@@ -14,6 +15,8 @@
 IMDb::IMDb() {
     // initialize what you need here.
     rated_movies_up_to_date = false;
+    checked_actor = false,
+    unchecked = true;
 }
 
 IMDb::~IMDb() {}
@@ -51,21 +54,37 @@ void IMDb::add_movie(std::string movie_name,
         int &last_year = current_actor.get_last_year();
         int &years = current_actor.get_years();
 
+        // Se actualizeaza anul de debut;
         if (debut_year > timestamp) {
             debut_year = timestamp;
         }
 
+        // Se actualizeaza ultimul an;
         if (last_year < timestamp) {
             last_year = timestamp;
         }
 
+        // Se actualizeaza anii de activitate;
         years = last_year - debut_year;
         if (max_years < current_actor || max_years.get_id() == "") {
             max_years = current_actor;
         }
 
+        // Se actualizeaza colaborarile regizorului;
         if (!found_director->second.check_collaboration(actor_ids[i])) {
             found_director->second.add_collaboration(actor_ids[i]);
+        }
+
+        // Se actualizeaza lista de colegi a fiecarui actor;
+        for (unsigned int j = 0; j < actor_ids.size(); ++j) {
+            if (i == j) {
+                continue;
+            } else {
+                if (checked_actor) {
+                    actors[actor_ids[j]].check();
+                }
+                actors[actor_ids[i]].add_colleague(actor_ids[j], actors[actor_ids[j]]);
+            }
         }
     }
 
@@ -159,7 +178,21 @@ std::string IMDb::get_best_year_for_category(std::string category) {
 }
 
 std::string IMDb::get_2nd_degree_colleagues(std::string actor_id) {
-    return "";
+    std::unordered_map<std::string, actor> &1st_degree, &2nd_degree;
+    std::map<std::string, actor> 2nd_degree_colleagues;
+    auto it = 1st_degree.begin();
+    1st_degree = actors[actor_ids].get_colleagues();
+
+    for (; it != 1st_degree.end(); ++it) {
+        2nd_degree = it->second.get_colleagues();
+        auto it1 = 2nd_degree.begin();
+        for (; it1 != 2nd_degree.end(); ++it1) {
+            if (it1->second.check() == unchecked) {
+                2nd_degree_colleagues.insert(*it1);
+                it1->second.checking();
+            }
+        }
+    }
 }
 
 std::string IMDb::get_top_k_most_recent_movies(int k) {
