@@ -1,3 +1,4 @@
+// Copyright 2017 Popa Bogdan, Rosca Alin-Costin
 #include <vector>
 #include <unordered_map>
 #include <string>
@@ -8,7 +9,7 @@ movie::movie() {
 	this->rating = 0;
 }
 
-movie::movie(int timestamp) {
+explicit movie::movie(int timestamp) {
 	this->movie_name = "";
 	this->movie_id = "";
 	this->timestamp = timestamp;
@@ -27,7 +28,7 @@ movie::movie(std::string movie_name, std::string movie_id, int timestamp,
 	this->rating = 0;
 }
 
-movie::~movie() {};
+movie::~movie() {}
 
 double movie::add_rating(std::string user_id, int rating) {
 	if (ratings.find(user_id) == ratings.end()) {

@@ -1,5 +1,6 @@
-#ifndef __IMDB__H__
-#define __IMDB__H__
+// Copyright 2017 Popa Bogdan, Rosca Alin-Costin
+#ifndef _HOME_STUDENT_RESOURCES_INCLUDE_MOVIE_H_
+#define _HOME_STUDENT_RESOURCES_INCLUDE_MOVIE_H_
 
 #include <string>
 #include <vector>
@@ -7,10 +8,10 @@
 #include <map>
 #include <set>
 
-#include "movie.h"
-#include "actor.h"
-#include "director.h"
-//#include "categories.h"
+#include "./movie.h"
+#include "./actor.h"
+#include "./director.h"
+// #include "categories.h"
 
 #define NONE                            "none"
 
@@ -35,7 +36,7 @@
 
 
 class IMDb {
-public:
+ public:
     IMDb();
     ~IMDb();
 
@@ -66,7 +67,7 @@ public:
     // input reader helper.
     std::string read_input_line(const std::string& line);
 
-private:
+ private:
     // Cheie: movie_id; Valoare: variabila de tip movie;
     std::unordered_map<std::string, movie> movies;
     // Filme sortate dupa an;
@@ -90,4 +91,4 @@ private:
     // bool unchecked;
 };
 
-#endif
+#endif  // _HOME_STUDENT_RESOURCES_INCLUDE_MOVIE_H_

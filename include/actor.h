@@ -1,11 +1,12 @@
-#ifndef __ACTOR__H__
-#define __ACTOR__H__
+// Copyright 2017 Popa Bogdan, Rosca Alin-Costin
+#ifndef _HOME_STUDENT_RESOURCES_INCLUDE_ACTOR_H_
+#define _HOME_STUDENT_RESOURCES_INCLUDE_ACTOR_H_
 
 #include <string>
 #include <unordered_set>
 
 class actor {
-private:
+ private:
 	int debut_year;
 	int last_year;
 	int years;
@@ -14,7 +15,7 @@ private:
 	std::string actor_id;
 	// std::unordered_set<std::string> colleagues;
 
-public:
+ public:
 	actor();
 	actor(std::string actor_id, std::string actor_name);
 	actor(const actor &actor2);
@@ -34,4 +35,4 @@ public:
 	// std::unordered_set<std::string>& get_colleagues();
 };
 
-#endif
+#endif  // _HOME_STUDENT_RESOURCES_INCLUDE_ACTOR_H_

@@ -1,0 +1,2 @@
+Done processing ./movie.h
+Total errors found: 0

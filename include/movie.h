@@ -1,12 +1,13 @@
-#ifndef __MOVIE__H__
-#define __MOVIE__H__
+// Copyright 2017 Popa Bogdan, Rosca Alin-Costin
+#ifndef _HOME_STUDENT_RESOURCES_INCLUDE_MOVIE_H_
+#define _HOME_STUDENT_RESOURCES_INCLUDE_MOVIE_H_
 
 #include <vector>
 #include <unordered_map>
 #include <string>
 
 class movie {
-private:
+ private:
 	int timestamp;
 	int position;
 	double rating_until_this;
@@ -18,9 +19,9 @@ private:
 	std::vector<std::string> actor_ids;
 	std::unordered_map<std::string, int> ratings;
 
-public:
+ public:
 	movie();
-	movie(int timestamp);
+	explicit movie(int timestamp);
 	movie(std::string movie_name, std::string movie_id, int timestamp,
 		  std::vector<std::string> categories, std::string director_name,
           std::vector<std::string> actor_ids);
@@ -43,4 +44,4 @@ public:
     bool operator<(const movie &movie1) const;
 };
 
-#endif
+#endif  // _HOME_STUDENT_RESOURCES_INCLUDE_MOVIE_H_

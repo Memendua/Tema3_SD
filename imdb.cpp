@@ -1,4 +1,7 @@
+// Copyright 2017 Popa Bogdan, Rosca Alin-Costin
+#include <limits.h>
 #include <iterator>
+#include <utility>
 #include <string>
 #include <sstream>
 #include <iomanip>
@@ -7,7 +10,6 @@
 #include <map>
 #include <set>
 #include <iostream>
-#include <limits.h>
 
 #include "include/imdb.h"
 
@@ -23,11 +25,10 @@ IMDb::~IMDb() {}
 
 void IMDb::add_movie(std::string movie_name,
                      std::string movie_id,
-                     int timestamp, // unix timestamp when movie was launched
+                     int timestamp,  // unix timestamp when movie was launched
                      std::vector<std::string> categories,
                      std::string director_name,
                      std::vector<std::string> actor_ids) {
-
     // Adaugare film in baza de date;
     movie m(movie_name, movie_id, timestamp, categories, director_name,
             actor_ids);
@@ -43,7 +44,8 @@ void IMDb::add_movie(std::string movie_name,
     auto found_director = directors.find(director_name);
 
     if (found_director == directors.end()) {
-        std::pair<std::string, director> elem(director_name, director(director_name));
+        std::pair<std::string, director> elem(director_name,
+                                              director(director_name));
         found_director = directors.insert(elem).first;
     }
 
@@ -116,7 +118,8 @@ void IMDb::add_rating(std::string user_id, std::string movie_id, int rating) {
     }
 }
 
-void IMDb::update_rating(std::string user_id, std::string movie_id, int rating) {
+void IMDb::update_rating(std::string user_id, std::string movie_id,
+                         int rating) {
     // Rating-ul se modifica, trebuie modificat map-ul de recent_movies
     rated_movies_up_to_date = false;
     double old_rating = movies[movie_id].update_rating(user_id, rating);
@@ -254,7 +257,7 @@ std::string IMDb::get_avg_rating_in_range(int start, int end) {
         // Daca rated_movies nu e up to date, il updatez
         auto it = rated_movies.begin();
         int i = 1;
-        
+
         // Primul element are suma rating-urilor egala cu rating-ul lui
         it->second.set_position(i++);
         it->second.set_rating_until_this(rating);

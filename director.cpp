@@ -1,3 +1,4 @@
+// Copyright 2017 Popa Bogdan, Rosca Alin-Costin
 #include <unordered_set>
 #include <string>
 
@@ -7,7 +8,7 @@ director::director() {
 	this->director_name = "";
 }
 
-director::director(std::string name) {
+explicit director::director(std::string name) {
     this->director_name = name;
 }
 
@@ -16,7 +17,7 @@ director::director(const director &director2) {
     this->collaborations = director2.collaborations;
 }
 
-director::~director() {};
+director::~director() {}
 
 director& director::operator=(const director &director2) {
     this->director_name = director2.director_name;

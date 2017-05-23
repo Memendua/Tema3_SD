@@ -1,5 +1,6 @@
-#include <string>
+// Copyright 2017 Popa Bogdan, Rosca Alin-Costin
 #include <limits.h>
+#include <string>
 
 #include "include/actor.h"
 
@@ -31,7 +32,7 @@ actor::actor(const actor &actor2) {
     // this->colleagues = actor2.colleagues;
 }
 
-actor::~actor() {};
+actor::~actor() {}
 
 int& actor::get_debut_year() {
     return debut_year;
