@@ -8,17 +8,22 @@
 #include <vector>
 #include <unordered_map>
 #include <map>
+#include <unordered_set>
 #include <set>
 #include <iostream>
+#include <algorithm>
 
 #include "include/imdb.h"
+#include "include/movie.h"
+#include "include/actor.h"
+#include "include/director.h"
+#include "include/categories.h"
+#include "include/years.h"
 
 
 IMDb::IMDb() {
     // initialize what you need here.
     rated_movies_up_to_date = false;
-    // checked_actor = false,
-    // unchecked = true;
 }
 
 IMDb::~IMDb() {}
@@ -39,6 +44,9 @@ void IMDb::add_movie(std::string movie_name,
     // Se schimba topul de popularitate
     popular_movies.clear();
 
+    for (unsigned int i = 0; i < categories.size(); ++i) {
+        Categories[categories[i]].add_movie_in_year(movies[movie_id]);
+    }
 
     // Caut directorul in baza de date
     auto found_director = directors.find(director_name);
@@ -78,16 +86,37 @@ void IMDb::add_movie(std::string movie_name,
         }
 
         // Se actualizeaza lista de colegi a fiecarui actor;
-        // for (unsigned int j = 0; j < actor_ids.size(); ++j) {
-        //     if (i == j) {
-        //         continue;
-        //     } else {
-        //         if (checked_actor) {
-        //             actors[actor_ids[j]].check();
-        //         }
-        //         actors[actor_ids[i]].add_colleague(actor_ids[j]);
-        //     }
-        // }
+        for (unsigned int j = 0; j < actor_ids.size(); ++j) {
+            if (i == j) {
+                continue;
+            }
+            actors[actor_ids[i]].add_colleague(actor_ids[j]);
+
+            if (j > i) {
+                std::string key;
+                if (actor_ids[i] < actor_ids[j]) {
+                    key = actor_ids[i] + actor_ids[j];
+                    if (actor_pairs.find(key) == actor_pairs.end()) {
+                        ActorPair ap(actor_ids[i], actor_ids[j]);
+                        std::pair<std::string, ActorPair> elem(key, ap);
+                        actor_pairs.insert(elem);
+                        actor_pairs[key].increase_collaboration();
+                    } else {
+                        actor_pairs[key].increase_collaboration();
+                    }
+                } else {
+                    key = actor_ids[j] + actor_ids[i];
+                    if (actor_pairs.find(key) == actor_pairs.end()) {
+                        ActorPair ap(actor_ids[j], actor_ids[i]);
+                        std::pair<std::string, ActorPair> elem(key, ap);
+                        actor_pairs.insert(elem);
+                        actor_pairs[key].increase_collaboration();
+                    } else {
+                        actor_pairs[key].increase_collaboration();
+                    }
+                }
+            }
+        }
     }
 
     if (max_coll < found_director->second) {
@@ -112,6 +141,12 @@ void IMDb::add_rating(std::string user_id, std::string movie_id, int rating) {
     // Se schimba topul de popularitate
     popular_movies.clear();
     movie &current_movie = movies[movie_id];
+    // Se schimba rating-ul, trebuie sa schimb top-ul anilor din categorii
+    std::vector<std::string> current_categ = current_movie.get_categories();
+    for (unsigned int i = 0; i < current_categ.size(); ++i) {
+        Categories[current_categ[i]].outdate(current_movie.get_timestamp());
+    }
+
     double old_rating = current_movie.add_rating(user_id, rating);
     if (current_movie.nr_ratings() == 1) {
         rated_movies.emplace(current_movie.get_timestamp(), current_movie);
@@ -122,7 +157,13 @@ void IMDb::update_rating(std::string user_id, std::string movie_id,
                          int rating) {
     // Rating-ul se modifica, trebuie modificat map-ul de recent_movies
     rated_movies_up_to_date = false;
-    double old_rating = movies[movie_id].update_rating(user_id, rating);
+    movie &current_movie = movies[movie_id];
+    // Se schimba rating-ul, trebuie sa schimb top-ul anilor din categorii
+    std::vector<std::string> current_categ = current_movie.get_categories();
+    for (unsigned int i = 0; i < current_categ.size(); ++i) {
+        Categories[current_categ[i]].outdate(current_movie.get_timestamp());
+    }
+    double old_rating = current_movie.update_rating(user_id, rating);
 }
 
 void IMDb::remove_rating(std::string user_id, std::string movie_id) {
@@ -131,6 +172,12 @@ void IMDb::remove_rating(std::string user_id, std::string movie_id) {
     // Se schimba topul de popularitate
     popular_movies.clear();
     movie &current_movie = movies[movie_id];
+    // Se schimba rating-ul, trebuie sa schimb top-ul anilor din categorii
+    std::vector<std::string> current_categ = current_movie.get_categories();
+    for (unsigned int i = 0; i < current_categ.size(); ++i) {
+        Categories[current_categ[i]].outdate(current_movie.get_timestamp());
+    }
+
     double old_rating = current_movie.remove_rating(user_id);
     if (current_movie.nr_ratings() == 0) {
         rated_movies.erase(current_movie.get_timestamp());
@@ -177,26 +224,47 @@ std::string IMDb::get_most_influential_director() {
 }
 
 std::string IMDb::get_best_year_for_category(std::string category) {
-    return "";
+    int best_year = Categories[category].get_best_year();
+
+    if (best_year == -1) {
+        return NONE;
+    }
+
+    return std::to_string(best_year);
 }
 
 std::string IMDb::get_2nd_degree_colleagues(std::string actor_id) {
-    // std::unordered_map<std::string, actor> &1st_degree, &2nd_degree;
-    // std::map<std::string, actor> 2nd_degree_colleagues;
-    // auto it = 1st_degree.begin();
-    // 1st_degree = actors[actor_ids].get_colleagues();
+    std::unordered_map<std::string, int> &first_degree =
+        actors[actor_id].get_colleagues();
 
-    // for (; it != 1st_degree.end(); ++it) {
-    //     2nd_degree = it->second.get_colleagues();
-    //     auto it1 = 2nd_degree.begin();
-    //     for (; it1 != 2nd_degree.end(); ++it1) {
-    //         if (it1->second.check() == unchecked) {
-    //             2nd_degree_colleagues.insert(*it1);
-    //             it1->second.checking();
-    //         }
-    //     }
-    // }
-    return "";
+    std::set<std::string> scnd_dgr_cllgs;
+    auto it = first_degree.begin();
+
+    for (; it != first_degree.end(); ++it) {
+        std::unordered_map<std::string, int> &second_degree =
+            actors[it->first].get_colleagues();
+        auto it1 = second_degree.begin();
+        for (; it1 != second_degree.end(); ++it1) {
+            if (scnd_dgr_cllgs.find(it1->first) == scnd_dgr_cllgs.end() &&
+                first_degree.find(it1->first) == first_degree.end() &&
+                it1->first != actor_id) {
+                scnd_dgr_cllgs.insert(it1->first);
+            }
+        }
+    }
+
+    if (scnd_dgr_cllgs.empty()) {
+        return NONE;
+    }
+
+    auto it1 = scnd_dgr_cllgs.begin();
+    std::string result = *it1;
+    ++it1;
+    for (; it1 != scnd_dgr_cllgs.end(); ++it1) {
+        result += " " + *it1;
+    }
+
+    return result;
 }
 
 std::string IMDb::get_top_k_most_recent_movies(int k) {
@@ -215,11 +283,61 @@ std::string IMDb::get_top_k_most_recent_movies(int k) {
 }
 
 std::string IMDb::get_top_k_actor_pairs(int k) {
-    return "";
+    if (actor_pairs.empty()) {
+        return NONE;
+    }
+
+    std::vector<ActorPair> Actor_Pairs(actor_pairs.size());
+    auto it = actor_pairs.begin();
+    int i = 0;
+    for (; it != actor_pairs.end(); ++it, ++i) {
+        Actor_Pairs[i] = it->second;
+    }
+
+    if (k > Actor_Pairs.size()) {
+        sort(Actor_Pairs.begin(), Actor_Pairs.end());
+    } else {
+        partial_sort(Actor_Pairs.begin(), Actor_Pairs.begin() + k,
+                     Actor_Pairs.end());
+    }
+
+    std::string result = Actor_Pairs[0].show_pair();
+    for (i = 1; i < Actor_Pairs.size() && i < k; ++i) {
+        result += " " + Actor_Pairs[i].show_pair();
+    }
+
+    return result;
 }
 
 std::string IMDb::get_top_k_partners_for_actor(int k, std::string actor_id) {
-    return "";
+    std::unordered_map<std::string, int> &partners =
+        actors[actor_id].get_colleagues();
+
+    if (partners.empty()) {
+        return NONE;
+    }
+
+    std::vector<ActorPair> Partners(partners.size());
+    int i = 0;
+    auto it = partners.begin();
+
+    for (; it != partners.end(); ++it, ++i) {
+        Partners[i] = ActorPair(it->first, actor_id, it->second);
+    }
+
+    if (k > Partners.size()) {
+        sort(Partners.begin(), Partners.end());
+    } else {
+        partial_sort(Partners.begin(), Partners.begin() + k,
+            Partners.end());
+    }
+
+    std::string result = Partners[0].show_partner();
+    for (i = 1; i < Partners.size() && i < k; ++i) {
+        result += " " + Partners[i].show_partner();
+    }
+
+    return result;
 }
 
 std::string IMDb::get_top_k_most_popular_movies(int k) {

@@ -8,7 +8,7 @@ director::director() {
 	this->director_name = "";
 }
 
-explicit director::director(std::string name) {
+director::director(std::string name) {
     this->director_name = name;
 }
 

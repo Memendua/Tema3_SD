@@ -35,9 +35,10 @@ class movie {
 
     double get_rating() const;
     double get_rating_until_this() const;
-    int get_timestamp() const;
+    int get_timestamp();
     int get_position() const;
     std::string get_movie_id() const;
+    std::vector<std::string> get_categories() const;
 
     int nr_ratings() const;
 

@@ -9,7 +9,7 @@ movie::movie() {
 	this->rating = 0;
 }
 
-explicit movie::movie(int timestamp) {
+movie::movie(int timestamp) {
 	this->movie_name = "";
 	this->movie_id = "";
 	this->timestamp = timestamp;
@@ -94,7 +94,7 @@ double movie::get_rating_until_this() const {
 	return this->rating_until_this;
 }
 
-int movie::get_timestamp() const {
+int movie::get_timestamp() {
 	return this->timestamp;
 }
 
@@ -104,6 +104,10 @@ int movie::get_position() const {
 
 std::string movie::get_movie_id() const {
 	return movie_id;
+}
+
+std::vector<std::string> movie::get_categories() const {
+	return categories;
 }
 
 int movie::nr_ratings() const {

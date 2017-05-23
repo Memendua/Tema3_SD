@@ -1,6 +1,6 @@
 // Copyright 2017 Popa Bogdan, Rosca Alin-Costin
-#ifndef _HOME_STUDENT_RESOURCES_INCLUDE_MOVIE_H_
-#define _HOME_STUDENT_RESOURCES_INCLUDE_MOVIE_H_
+#ifndef _HOME_STUDENT_RESOURCES_INCLUDE_IMDB_H_
+#define _HOME_STUDENT_RESOURCES_INCLUDE_IMDB_H_
 
 #include <string>
 #include <vector>
@@ -11,7 +11,8 @@
 #include "./movie.h"
 #include "./actor.h"
 #include "./director.h"
-// #include "categories.h"
+#include "./categories.h"
+#include "./years.h"
 
 #define NONE                            "none"
 
@@ -75,6 +76,8 @@ class IMDb {
     std::map<int, movie&> rated_movies;
     // Cheie: actor_id; Valoare: variabila de tip actor;
     std::unordered_map<std::string, actor> actors;
+    // Cheie: id-urile celor 2 actori; Valoare: perechea de actori;
+    std::unordered_map<std::string, ActorPair> actor_pairs;
     actor max_years;
     // Cheie: nume director; Valoare: variabila de tip director;
     std::unordered_map<std::string, director> directors;
@@ -85,10 +88,8 @@ class IMDb {
     std::set<movie> popular_movies;
     // Variabila ce verifica daca rated_movies trebuie modificat sau nu
     bool rated_movies_up_to_date;
-    // Variabila ce determina daca un actor a fost adaugat;
-    // bool checked_actor;
-    // Variabila ce verifica daca un actor nu a fost adaugat;
-    // bool unchecked;
+    // Cheie: categorii; Valoare: variabila de tip categorie
+    std::unordered_map<std::string, category> Categories;
 };
 
 #endif  // _HOME_STUDENT_RESOURCES_INCLUDE_MOVIE_H_

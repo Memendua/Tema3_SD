@@ -3,17 +3,16 @@
 #define _HOME_STUDENT_RESOURCES_INCLUDE_ACTOR_H_
 
 #include <string>
-#include <unordered_set>
+#include <unordered_map>
 
 class actor {
  private:
 	int debut_year;
 	int last_year;
 	int years;
-	// bool checked;
 	std::string actor_name;
 	std::string actor_id;
-	// std::unordered_set<std::string> colleagues;
+	std::unordered_map<std::string, int> colleagues;
 
  public:
 	actor();
@@ -25,14 +24,34 @@ class actor {
 	int& get_last_year();
 	int& get_years();
 	std::string get_id();
-	// bool check();
-	// void checking();
 
 	bool operator<(const actor &actor2) const;
 	actor& operator=(const actor &actor2);
 
-	// void add_colleague(std::string id1);
-	// std::unordered_set<std::string>& get_colleagues();
+	void add_colleague(std::string id);
+	bool check_colleague(std::string id);
+	std::unordered_map<std::string, int>& get_colleagues();
+};
+
+class ActorPair {
+ private:
+	std::string actor1_id;
+	std::string actor2_id;
+	int movies_together;
+
+ public:
+ 	ActorPair();
+ 	ActorPair(std::string actor1_id, std::string actor2_id);
+ 	ActorPair(std::string actor1_id, std::string actor2_id, int m);
+ 	ActorPair(const ActorPair &p);
+ 	~ActorPair();
+
+ 	std::string show_pair();
+ 	std::string show_partner();
+ 	void increase_collaboration();
+
+ 	bool operator<(const ActorPair &p);
+ 	ActorPair& operator=(const ActorPair &p);
 };
 
 #endif  // _HOME_STUDENT_RESOURCES_INCLUDE_ACTOR_H_
