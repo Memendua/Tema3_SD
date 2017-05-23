@@ -15,8 +15,8 @@
 IMDb::IMDb() {
     // initialize what you need here.
     rated_movies_up_to_date = false;
-    checked_actor = false,
-    unchecked = true;
+    // checked_actor = false,
+    // unchecked = true;
 }
 
 IMDb::~IMDb() {}
@@ -76,16 +76,16 @@ void IMDb::add_movie(std::string movie_name,
         }
 
         // Se actualizeaza lista de colegi a fiecarui actor;
-        for (unsigned int j = 0; j < actor_ids.size(); ++j) {
-            if (i == j) {
-                continue;
-            } else {
-                if (checked_actor) {
-                    actors[actor_ids[j]].check();
-                }
-                actors[actor_ids[i]].add_colleague(actor_ids[j], actors[actor_ids[j]]);
-            }
-        }
+        // for (unsigned int j = 0; j < actor_ids.size(); ++j) {
+        //     if (i == j) {
+        //         continue;
+        //     } else {
+        //         if (checked_actor) {
+        //             actors[actor_ids[j]].check();
+        //         }
+        //         actors[actor_ids[i]].add_colleague(actor_ids[j]);
+        //     }
+        // }
     }
 
     if (max_coll < found_director->second) {
@@ -178,21 +178,22 @@ std::string IMDb::get_best_year_for_category(std::string category) {
 }
 
 std::string IMDb::get_2nd_degree_colleagues(std::string actor_id) {
-    std::unordered_map<std::string, actor> &1st_degree, &2nd_degree;
-    std::map<std::string, actor> 2nd_degree_colleagues;
-    auto it = 1st_degree.begin();
-    1st_degree = actors[actor_ids].get_colleagues();
+    // std::unordered_map<std::string, actor> &1st_degree, &2nd_degree;
+    // std::map<std::string, actor> 2nd_degree_colleagues;
+    // auto it = 1st_degree.begin();
+    // 1st_degree = actors[actor_ids].get_colleagues();
 
-    for (; it != 1st_degree.end(); ++it) {
-        2nd_degree = it->second.get_colleagues();
-        auto it1 = 2nd_degree.begin();
-        for (; it1 != 2nd_degree.end(); ++it1) {
-            if (it1->second.check() == unchecked) {
-                2nd_degree_colleagues.insert(*it1);
-                it1->second.checking();
-            }
-        }
-    }
+    // for (; it != 1st_degree.end(); ++it) {
+    //     2nd_degree = it->second.get_colleagues();
+    //     auto it1 = 2nd_degree.begin();
+    //     for (; it1 != 2nd_degree.end(); ++it1) {
+    //         if (it1->second.check() == unchecked) {
+    //             2nd_degree_colleagues.insert(*it1);
+    //             it1->second.checking();
+    //         }
+    //     }
+    // }
+    return "";
 }
 
 std::string IMDb::get_top_k_most_recent_movies(int k) {

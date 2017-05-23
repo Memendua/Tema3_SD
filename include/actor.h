@@ -2,17 +2,17 @@
 #define __ACTOR__H__
 
 #include <string>
-#include <unordered_map>
+#include <unordered_set>
 
 class actor {
 private:
 	int debut_year;
 	int last_year;
 	int years;
-	bool checked;
+	// bool checked;
 	std::string actor_name;
 	std::string actor_id;
-	std::unordered_map<std::string, actor> colleagues;
+	// std::unordered_set<std::string> colleagues;
 
 public:
 	actor();
@@ -24,14 +24,14 @@ public:
 	int& get_last_year();
 	int& get_years();
 	std::string get_id();
-	bool check();
-	void checking();
+	// bool check();
+	// void checking();
 
 	bool operator<(const actor &actor2) const;
 	actor& operator=(const actor &actor2);
 
-	void add_colleague(std::string id1, actor actor1);
-	std::unordered_map<std::string, actor>& get_colleagues();
+	// void add_colleague(std::string id1);
+	// std::unordered_set<std::string>& get_colleagues();
 };
 
 #endif

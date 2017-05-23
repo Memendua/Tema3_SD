@@ -9,7 +9,7 @@ actor::actor() {
 	this->debut_year = INT_MAX;
 	this->last_year = INT_MIN;
 	this->years = 0;
-    this->checked = false;
+    // this->checked = false;
 }
 
 actor::actor(std::string actor_id, std::string actor_name) {
@@ -18,17 +18,17 @@ actor::actor(std::string actor_id, std::string actor_name) {
 	this->debut_year = INT_MAX;
 	this->last_year = INT_MIN;
 	this->years = 0;
-    this->checked = false;
+    // this->checked = false;
 }
 
 actor::actor(const actor &actor2) {
     this->debut_year = actor2.debut_year;
     this->last_year = actor2.last_year;
     this->years = actor2.years;
-    this->checked = actor2.checked;
+    // this->checked = actor2.checked;
     this->actor_name = actor2.actor_name;
     this->actor_id = actor2.actor_id;
-    this->colleagues = actor2.colleagues;
+    // this->colleagues = actor2.colleagues;
 }
 
 actor::~actor() {};
@@ -49,13 +49,13 @@ std::string actor::get_id() {
 	return actor_id;
 }
 
-bool actor::check() {
-    return checked;
-}
+// bool actor::check() {
+//     return checked;
+// }
 
-void actor::checking() {
-    checked = !checked;
-}
+// void actor::checking() {
+//     checked = !checked;
+// }
 
 bool actor::operator<(const actor &actor2) const {
     if (this->years < actor2.years) {
@@ -75,15 +75,14 @@ actor& actor::operator=(const actor &actor2) {
     this->years = actor2.years;
     this->actor_name = actor2.actor_name;
     this->actor_id = actor2.actor_id;
-    this->colleagues = actor2.colleagues;
+    // this->colleagues = actor2.colleagues;
     return *this;
 }
 
-void actor::add_colleague(std::string id1, actor actor1) {
-    std::pair<std::string, actor> elem(id1, actor1);
-    this->colleagues.insert(elem);
-}
+// void actor::add_colleague(std::string id1) {
+//     this->colleagues.insert(id1);
+// }
 
-std::unordered_map<std::string, actor>& actor::get_colleagues() {
-    return colleagues;
-}
+// std::unordered_set<std::string>& actor::get_colleagues() {
+//     return colleagues;
+// }
